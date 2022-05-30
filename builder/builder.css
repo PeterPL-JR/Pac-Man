@@ -1,0 +1,83 @@
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+:root {
+    --tile-size: 50px;
+}
+
+#tiles-content {
+    margin-top: 100px;
+    margin-bottom: 50px;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tile-div {
+    position: absolute !important;
+    width: var(--tile-size);
+    height: var(--tile-size);
+
+    background-color: black;
+    outline: solid #3b3b3b 1px;
+}
+.tile-div:hover {
+    cursor: pointer;
+    background-color: #212121;
+    /* z-index: 10; */
+}
+
+#panels-content {
+    width: 1000px;
+    height: 140px;
+    cursor: pointer;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tile-panel {
+    float: left;
+    width: 70px;
+    height: 70px;
+}
+
+.tile-panel img {
+    margin: 10px;
+}
+
+#checked-tile img {
+    cursor: pointer;
+    outline: solid white 2px;
+}
+
+#save-div {
+    display: none;
+}
+
+select {
+    width: 40px;
+    background-color: #3b3b3b;
+    color: white;
+
+}
+button {
+    margin-top: 10px;
+    padding: 3px;
+    width: 80px;
+
+    font: normal 15px 'Verdana';
+    color: white;
+    background-color: #212121;
+    border: solid #d9d9d9 2px;
+    border-radius: 3px;
+    transition: 0.1s;
+}
+
+button:hover {
+    background-color: #505050;
+    cursor: pointer;
+    transition: 0.1s;
+}

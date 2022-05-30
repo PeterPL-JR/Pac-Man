@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Pac-Man Builder</title>
+    <link rel="stylesheet" href="../login.css" type="text/css">
+    <link rel="stylesheet" href="builder.css" type="text/css">
+    <script src="../library.js"></script>
+</head>
+<body>
+    <div id="content">
+        <div id="main">
+            <h1 id="h1">Create Map</h1>
+            <p id="txt">Width</p>
+            <input type="number" placeholder="Map Width" id="width" value="27">
+            <p id="txt">Height</p>
+            <input type="number" placeholder="Map Height" id="height" value="11">
+            <button onclick="openBuilder();" id="btn">Open Builder</button>
+        </div>
+    </div>
+    <script>
+        var widthInput = getId("width");
+        var heightInput = getId("height");
+        
+        var content = getId("content");
+        widthInput.focus();
+
+        const tileSize = 50;
+        var divs = [];
+        var panels = [];
+
+        var tiles;
+        var checkedTile = -1;
+
+        var width = -1;
+        var height = -1;
+        var MAP_STRING;
+
+        function openBuilder() {
+            width = parseInt(widthInput.value);
+            height = parseInt(heightInput.value);
+
+            const min = 11;
+            const max = 35;
+
+            if(!isNaN(width) && !isNaN(height)) {
+                if(width >= min && width <= max && height >= min && height <= max) {
+                    createBuilder();
+                    return;
+                }
+            }
+            width = -1;
+            height = -1;
+        }
+
+        function createBuilder() {
+            serverGet("builder.php", {query: "tiles"}, function(text) {
+                tiles = JSON.parse(text);
+                content.innerHTML = "";
+
+                var tilesContent = document.createElement("div");
+                tilesContent.id = "tiles-content";
+                tilesContent.style.width = (width * tileSize) + "px";
+                tilesContent.style.height = (height * tileSize) + "px";
+                content.appendChild(tilesContent);
+
+                for(var x = 0; x < width; x++) {
+                    divs[x] = [];
+                    for(var y = 0; y < height; y++) {
+                        
+                        var div = document.createElement("div");
+                        div.className = "tile-div";
+                        div.setAttribute("onclick", `buildTile(${x}, ${y})`);
+
+                        div.style.setProperty("left", (x * tileSize) + "px");
+                        div.style.setProperty("top", (y * tileSize) + "px");
+                        tilesContent.appendChild(div);
+                        
+                        divs[x][y] = {
+                            elem: div,
+                            tile: 13,
+
+                            xPos: x,
+                            yPos: y
+                        };
+                    }
+                }
+
+                var panelsContent = document.createElement("div");
+                panelsContent.id = "panels-content";
+                content.appendChild(panelsContent);
+
+                for(var i = 0; i < tiles.length; i++) {
+                    var panel = document.createElement("div");
+                    panel.className = "tile-panel";
+                    panel.innerHTML = `<img src='../images/tiles/${tiles[i]}'>`;
+                    panel.setAttribute("onclick", `checkPanel(${i});`);
+                    
+                    panels.push(panel);
+                    panelsContent.appendChild(panel);
+                }
+
+                for(var x = 0; x < divs.length; x++) {
+                    for(var y = 0; y < divs[x].length; y++) {
+                        divs[x][y].elem.setAttribute("onmousedown", `setException(${x}, ${y})`);
+                    }
+                }
+
+                getId("save-div").style.display = "inline-block";
+                saveMap();
+            });
+        }
+
+        function setException(x, y) {
+            if(window.event.button == 1) {
+                if(divs[x][y].tile != -11) {
+
+                    divs[x][y].tile = -11;
+                    divs[x][y].elem.style.setProperty("background-color", "#661111");
+                    divs[x][y].elem.innerHTML = "";
+                } else {
+                    divs[x][y].tile = 13;
+                    divs[x][y].elem.style.removeProperty("background-color");
+                }
+                saveMap();
+            }
+        }
+
+        function buildTile(x, y) {
+            var img = document.createElement("img");
+            if(checkedTile != -1) {
+                img.src = `../images/tiles/${tiles[checkedTile]}`;
+            }
+
+            if(checkedTile != -1) {
+                divs[x][y].tile = checkedTile;
+            }
+            divs[x][y].elem.innerHTML = "";
+            divs[x][y].elem.appendChild(img);
+            saveMap();
+        }
+
+        function checkPanel(index) {
+            for(var panel of panels) {
+                panel.id = "";
+            }
+
+            panels[index].id = "checked-tile";
+            checkedTile = index;
+        }
+
+        function saveMap() {
+            var indexes = [];
+            
+            for(var x = 0; x < width; x++) {
+                indexes[x] = [];
+                for(var y = 0; y < height; y++) {
+                    indexes[x][y] = divs[x][y].tile;
+                }
+            }
+
+            var str = JSON.stringify(indexes);
+            MAP_STRING = str;
+        }
+    </script>
+
+<div id="save-div">
+    <select id="level">
+    </select><br>
+    <button onclick="saveLevel()">Zapisz</button><br>
+    <button onclick="loadLevel()">Czytaj</button><br>
+</div>
+<script>
+    var select = getId("level");
+    serverGet("builder.php", {query: "create-level"}, function(text) {
+        var counter = parseInt(text);
+        for(var i = 0; i < counter; i++) {
+            var option = document.createElement("option");
+            option.innerHTML = i + 1;
+            select.appendChild(option);
+        }
+    });
+
+    function saveLevel() {
+        var mapString = MAP_STRING;
+        var level = select.selectedIndex + 1;
+
+        var bufferObj = JSON.parse(mapString);
+        var width = bufferObj.length;
+        var height = bufferObj[0].length;
+
+        console.log(mapString);
+
+        serverGet("builder.php", {
+            query: "save-level", 
+            level: level,
+            string: mapString,
+
+            width: width,
+            height: height
+
+        }, function(text) {
+            
+        })
+    }
+
+    function loadLevel() {
+
+        var level = select.selectedIndex + 1;
+        serverGet("builder.php", {query: "load-level", level: level}, function(text) {
+            var obj = JSON.parse(text);
+
+            var string = JSON.parse(obj.string);
+            var width = obj.width;
+            var height = obj.height;
+            
+            for(var x = 0; x < width; x++) {
+                for(var y = 0; y < height; y++) {
+                    var index = string[x][y];
+                    if(index == -11) {
+                        divs[x][y].tile = -11;
+                        divs[x][y].elem.style.setProperty("background-color", "#661111");
+                    } else {
+                        divs[x][y].tile = index;
+                        divs[x][y].elem.innerHTML = `<img src='../images/tiles/${tiles[index]}'>`;
+                    }
+                    
+                }
+            }
+            saveMap();
+        });
+    }
+</script>
+</body>
+</html>
