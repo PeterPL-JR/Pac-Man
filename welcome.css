@@ -1,0 +1,19 @@
+*{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+html {
+    height: 100%;
+}
+body {
+    background: linear-gradient(to left top, rgb(0, 4, 21), rgb(68, 66, 66));
+}
+div#welcome{
+    height: 250px;
+    width: 600px;
+    margin:auto;
+    background-color: black;
+    opacity: 0.5;
+    padding: 3px;
+    border-radius: 40px;
+    text-align: center;
+}

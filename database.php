@@ -3,7 +3,7 @@
 $base = mysqli_connect(
     "localhost", 
     "root", "", 
-    "pacman-data"
+    "pacman_data"
 );
 
 ?>

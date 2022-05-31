@@ -183,7 +183,7 @@ function draw() {
     for(var ghost of ghosts) {
         ghost.update();
         canvas.drawImage(ghost.face, ghost.x, ghost.y);
-        break;
+        // break;
     } 
 
     // Print
