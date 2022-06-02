@@ -233,11 +233,11 @@ function draw() {
 }
 
 function setSpectreMode() {
-    for (var ghost of ghosts) {
-        ghost.spectre = true;
-    }
-
     if (spectreInterval == null) {
+        for (var ghost of ghosts) {
+            ghost.spectre = true;
+        }
+
         spectreInterval = setInterval(function () {
             spectreTime++;
 
@@ -273,7 +273,7 @@ function createGhosts() {
     for (var i = 0; i < ghostsColors.length; i++) {
         var ghost = new Ghost(ghostsColors[i], 11 * tileSize, 5 * tileSize, targets[i][0], targets[i][1]);
         ghosts.push(ghost);
-        break;
+        // break;
     }
 }
 
