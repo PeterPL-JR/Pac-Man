@@ -67,14 +67,17 @@ function createMapTiles(pixels, mapWidth, mapHeight) {
     for(var x = 0; x < mapWidth; x++) {
         tiles[x] = [];
         for(var y = 0; y < mapHeight; y++) {
-            var block = (pixels[x][y] == -11); 
+            var block = (pixels[x][y] == -11);
+            var power = (pixels[x][y] == -4);
+
             var index = pixels[x][y];
-            if(index == -11) index = 13;
+            if(index == -11 || index == -4) index = 13;
             
             tiles[x][y] = { 
                 tile: index,
                 solid: (index != 13),
-                block: block
+                block: block,
+                power: power
             };
         }
     }

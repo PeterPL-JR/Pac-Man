@@ -6,12 +6,14 @@ var tiles = [];
 const ghosts = [];
 
 var gameCoins = [];
+var gamePowers = [];
 var yourCoins = 0;
 
 // Player Data
 var playerColor = "yellow";
 const speed = 2.5;
 const eatTime = 16;
+const spectreSpeed = 1;
 
 // Movement Data
 var xDir = 0;
@@ -41,6 +43,7 @@ var beginImage;
 var fullPlayerImage;
 var playerNowImage;
 var coinImage;
+var powerImage;
 
 var winner = false;
 var over = false;
@@ -55,13 +58,9 @@ var height;
 var mapPixels;
 var mapImages;
 
-// Classes
-class Coin {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
+// Faces
+var spectreFaces1 = [];
+var spectreFaces2 = [];
 
 function init() {
     for (var i = 0; i < 4; i++) onAllTheRightFaces[movingKeys[i]] = createImage("player_" + dirs[i] + ".png");
@@ -70,6 +69,8 @@ function init() {
     // Load Images
     fullPlayerImage = createImage("player_full.png");
     coinImage = createImage("coin.png");
+    powerImage = createImage("power.png");
+    getSpectreFaces();
 
     connectMap(1, function (array) {
         // Size Variables
@@ -146,16 +147,21 @@ function draw() {
         }
     }
 
+    // Render Tiles
     for (var x = 0; x < mapWidth; x++) {
         for (var y = 0; y < mapHeight; y++) {
-
             var index = tiles[x][y].tile;
             canvas.drawImage(mapImages[index], x * tileSize, y * tileSize);
         }
     }
 
+    // Render Coins
     for (var coin of gameCoins) {
-        canvas.drawImage(coinImage, coin.x * tileSize, coin.y * tileSize);
+        canvas.drawImage(coinImage, coin[0] * tileSize, coin[1] * tileSize);
+    }
+    // Render Powers
+    for(var power of gamePowers) {
+        canvas.drawImage(powerImage, power[0] * tileSize, power[1] * tileSize);
     }
 
     var playerImage = (xDir == 0 && yDir == 0) ? fullPlayerImage : playerNowImage;
@@ -165,17 +171,33 @@ function draw() {
     canvas.drawImage(renderingImage, playerX, playerY);
 
     if ((playerX + playerY) % 50 == 0) {
-        var index = gameCoins.findIndex(function (obj) {
-            return (obj.x == playerX / tileSize) && (obj.y == playerY / tileSize);
+        var coinIndex = gameCoins.findIndex(function (obj) {
+            return (obj[0] == playerX / tileSize) && (obj[1] == playerY / tileSize);
         });
-        if (index != -1) {
-            gameCoins.splice(index, 1);
+        var powerIndex = gamePowers.findIndex(function (obj) {
+            return (obj[0] == playerX / tileSize) && (obj[1] == playerY / tileSize);
+        });
+
+        if (coinIndex != -1) {
+            gameCoins.splice(coinIndex, 1);
             yourCoins++;
 
             // If Player wins a game
             if (gameCoins.length == 0) {
                 winGame();
             }
+        }
+        if(powerIndex != -1) {
+            gamePowers.splice(powerIndex, 1);
+            for(var ghost of ghosts) {
+                ghost.spectre = true;
+            }
+
+            setTimeout(function() {
+                for(var i = 0; i < ghosts.length; i++) {
+                    ghosts[i].spectre = false;
+                } 
+            }, 10_000);
         }
     }
 
@@ -215,20 +237,23 @@ function createCoins() {
     // Create Coins on the map
     for (var y = 0; y < mapHeight; y++) {
         for (var x = 0; x < mapWidth; x++) {
-            if (tiles[x][y].solid || tiles[x][y].block) continue;
-            gameCoins.push(new Coin(x, y));
+            if(tiles[x][y].power) gamePowers.push([x, y]);
+            if (tiles[x][y].solid || tiles[x][y].block || tiles[x][y].power) continue;
+            gameCoins.push([x, y]);
         }
     }
+    
 }
 
 function createGhosts() {
-    for(var i = 0; i < ghostsColors.length; i++) {
-        do {
-            var randX = getRandom(0, mapWidth - 1);
-            var randY = getRandom(0, mapHeight - 1);
-        } while(tiles[randX][randY].solid);
+    var targets = [
+        [1, 1], [25, 1], [6, 11], [20, 11]
+    ];
 
-        ghosts.push(new Ghost(ghostsColors[i], randX * tileSize, randY * tileSize));
+    for(var i = 0; i < ghostsColors.length; i++) {
+        var ghost = new Ghost(ghostsColors[i], 11 * tileSize, 5 * tileSize, targets[i][0], targets[i][1]);
+        ghosts.push(ghost);
+        break;
     }
 }
 

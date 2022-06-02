@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.0.1
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Czas generowania: 31 Maj 2022, 15:21
--- Wersja serwera: 10.1.32-MariaDB
--- Wersja PHP: 5.6.36
+-- Generation Time: Jun 02, 2022 at 06:05 PM
+-- Server version: 10.4.22-MariaDB
+-- PHP Version: 8.1.2
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -19,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Baza danych: `pacman_data`
+-- Database: `pacman_data`
 --
 
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `levels`
+-- Table structure for table `levels`
 --
 
 CREATE TABLE `levels` (
@@ -36,16 +35,16 @@ CREATE TABLE `levels` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Zrzut danych tabeli `levels`
+-- Dumping data for table `levels`
 --
 
 INSERT INTO `levels` (`id`, `map_data`, `width`, `height`) VALUES
-(1, '[[6,19,19,19,9,15,-11,15,6,19,19,19,9],[15,13,13,13,15,15,-11,15,15,13,13,13,15],[15,13,25,13,0,3,-11,0,3,13,25,13,15],[15,13,15,13,13,13,13,13,13,13,15,13,15],[15,13,15,13,6,19,19,19,9,13,15,13,15],[15,13,26,13,15,13,13,13,15,13,26,13,15],[15,13,13,13,26,13,25,13,26,13,13,13,15],[15,13,25,13,13,13,15,13,13,13,27,19,23],[15,13,20,19,19,19,21,19,9,13,13,13,15],[15,13,26,-11,-11,-11,-11,-11,20,19,24,13,15],[15,13,13,-11,6,19,9,-11,15,13,13,13,15],[15,13,25,-11,15,-11,15,-11,26,13,25,13,15],[15,13,15,-11,26,-11,15,-11,13,13,15,13,15],[15,13,15,-11,-11,-11,15,-11,27,19,23,-11,15],[15,13,15,-11,25,-11,15,-11,13,13,15,13,15],[15,13,26,-11,15,-11,15,-11,25,13,26,13,15],[15,13,13,-11,0,19,3,-11,15,13,13,13,15],[15,13,25,-11,-11,-11,-11,-11,20,19,24,13,15],[15,13,20,19,19,19,22,19,3,13,13,13,15],[15,13,26,13,13,13,15,13,13,13,27,19,23],[15,13,13,13,25,13,26,13,25,13,13,13,15],[15,13,25,13,15,13,13,13,15,13,25,13,15],[15,13,15,13,0,19,19,19,3,13,15,13,15],[15,13,15,13,13,13,13,13,13,13,15,13,15],[15,13,26,13,6,9,-11,6,9,13,26,13,15],[15,13,13,13,15,15,-11,15,15,13,13,13,15],[0,19,19,19,3,15,-11,15,0,19,19,19,3]]', 27, 13);
+(1, '[[6,19,19,19,9,15,-11,15,6,19,19,19,9],[15,13,13,-4,15,15,-11,15,15,-4,13,13,15],[15,13,25,13,0,3,-11,0,3,13,25,13,15],[15,13,15,13,13,13,13,13,13,13,15,13,15],[15,13,15,13,6,19,19,19,9,13,15,13,15],[15,13,26,13,15,13,-4,13,15,13,26,13,15],[15,13,13,13,26,13,25,13,26,13,13,13,15],[15,13,25,13,13,13,15,13,13,13,27,19,23],[15,13,20,19,19,19,21,19,9,13,13,13,15],[15,13,26,-11,-11,-11,-11,-11,20,19,24,13,15],[15,13,13,-11,6,19,9,-11,15,13,13,13,15],[15,13,25,-11,15,-11,15,-11,26,13,25,13,15],[15,13,15,-11,26,-11,15,-11,13,13,15,13,15],[15,13,15,-11,-11,-11,15,-11,27,19,23,-11,15],[15,13,15,-11,25,-11,15,-11,13,13,15,13,15],[15,13,26,-11,15,-11,15,-11,25,13,26,13,15],[15,13,13,-11,0,19,3,-11,15,13,13,13,15],[15,13,25,-11,-11,-11,-11,-11,20,19,24,13,15],[15,13,20,19,19,19,22,19,3,13,13,13,15],[15,13,26,13,13,13,15,13,13,13,27,19,23],[15,13,13,13,25,13,26,13,25,13,13,13,15],[15,13,25,13,15,13,-4,13,15,13,25,13,15],[15,13,15,13,0,19,19,19,3,13,15,13,15],[15,13,15,13,13,13,13,13,13,13,15,13,15],[15,13,26,13,6,9,-11,6,9,13,26,13,15],[15,13,13,-4,15,15,-11,15,15,-4,13,13,15],[0,19,19,19,3,15,-11,15,0,19,19,19,3]]', 27, 13);
 
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `tiles_variants`
+-- Table structure for table `tiles_variants`
 --
 
 CREATE TABLE `tiles_variants` (
@@ -54,7 +53,7 @@ CREATE TABLE `tiles_variants` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Zrzut danych tabeli `tiles_variants`
+-- Dumping data for table `tiles_variants`
 --
 
 INSERT INTO `tiles_variants` (`id`, `file_name`) VALUES
@@ -90,7 +89,7 @@ INSERT INTO `tiles_variants` (`id`, `file_name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -98,38 +97,39 @@ CREATE TABLE `users` (
   `nick` varchar(20) NOT NULL,
   `login` varchar(20) NOT NULL,
   `password` varchar(61) NOT NULL,
-  `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `creation_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `image_link` varchar(30) DEFAULT NULL,
   `coins` int(10) UNSIGNED DEFAULT NULL,
   `gems` int(10) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Zrzut danych tabeli `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `nick`, `login`, `password`, `creation_date`, `image_link`, `coins`, `gems`) VALUES
 (4, 'test', 'test', '$2y$10$0aqyuLmwoy6DY/hoIJubwOKS9xbkxoaz50GwfUuNeYMI8hqGh2iPS', '2022-05-25 12:28:59', NULL, NULL, NULL),
-(5, 'PeterPLJR', 'peterpl-jr', '$2y$10$nh.lPBgSkTWNJf6ZKOCOKORShOY0CAUCQqwZ3DF3crwCQYwHkxghe', '2022-05-31 12:57:49', NULL, NULL, NULL);
+(5, 'PeterPLJR', 'peterpl-jr', '$2y$10$nh.lPBgSkTWNJf6ZKOCOKORShOY0CAUCQqwZ3DF3crwCQYwHkxghe', '2022-05-31 12:57:49', NULL, NULL, NULL),
+(6, 'radek', 'radek', '$2y$10$rCqu.7QciLBw5FHXmMiOI.lsle8PcJ7FaqAVTR7SHvwQKePiazQKi', '2022-05-31 17:54:07', NULL, NULL, NULL);
 
 --
--- Indeksy dla zrzutów tabel
+-- Indexes for dumped tables
 --
 
 --
--- Indeksy dla tabeli `levels`
+-- Indexes for table `levels`
 --
 ALTER TABLE `levels`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeksy dla tabeli `tiles_variants`
+-- Indexes for table `tiles_variants`
 --
 ALTER TABLE `tiles_variants`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeksy dla tabeli `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
@@ -140,22 +140,22 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT dla tabeli `levels`
+-- AUTO_INCREMENT for table `levels`
 --
 ALTER TABLE `levels`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT dla tabeli `tiles_variants`
+-- AUTO_INCREMENT for table `tiles_variants`
 --
 ALTER TABLE `tiles_variants`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
--- AUTO_INCREMENT dla tabeli `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
