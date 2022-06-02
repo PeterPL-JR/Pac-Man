@@ -58,9 +58,16 @@ var height;
 var mapPixels;
 var mapImages;
 
-// Faces
+// Spectre Variables
 var spectreFaces1 = [];
 var spectreFaces2 = [];
+
+var spectreEndFaces1 = [];
+var spectreEndFaces2 = [];
+
+const totalSpectreTime = 11;
+var spectreTime = 0;
+var spectreInterval = null;
 
 function init() {
     for (var i = 0; i < 4; i++) onAllTheRightFaces[movingKeys[i]] = createImage("player_" + dirs[i] + ".png");
@@ -160,7 +167,7 @@ function draw() {
         canvas.drawImage(coinImage, coin[0] * tileSize, coin[1] * tileSize);
     }
     // Render Powers
-    for(var power of gamePowers) {
+    for (var power of gamePowers) {
         canvas.drawImage(powerImage, power[0] * tileSize, power[1] * tileSize);
     }
 
@@ -187,30 +194,22 @@ function draw() {
                 winGame();
             }
         }
-        if(powerIndex != -1) {
+        if (powerIndex != -1) {
             gamePowers.splice(powerIndex, 1);
-            for(var ghost of ghosts) {
-                ghost.spectre = true;
-            }
-
-            setTimeout(function() {
-                for(var i = 0; i < ghosts.length; i++) {
-                    ghosts[i].spectre = false;
-                } 
-            }, 10_000);
+            setSpectreMode();
         }
     }
 
     // Render Ghosts
-    for(var ghost of ghosts) {
+    for (var ghost of ghosts) {
         ghost.update();
         canvas.drawImage(ghost.face, ghost.x, ghost.y);
         // break;
-    } 
+    }
 
     // Print
-    if(time == 1) {
-        
+    if (time == 1) {
+
     }
 
     // Player out of Bounds 
@@ -233,16 +232,37 @@ function draw() {
     }
 }
 
+function setSpectreMode() {
+    for (var ghost of ghosts) {
+        ghost.spectre = true;
+    }
+
+    if (spectreInterval == null) {
+        spectreInterval = setInterval(function () {
+            spectreTime++;
+
+            if (spectreTime > totalSpectreTime) {
+                for (var i = 0; i < ghosts.length; i++) ghosts[i].spectre = false;
+                spectreTime = 0;
+
+                clearInterval(spectreInterval);
+                spectreInterval = null;
+            }
+        }, 1000);
+    } else {
+        spectreTime = 0;
+    }
+}
+
 function createCoins() {
     // Create Coins on the map
     for (var y = 0; y < mapHeight; y++) {
         for (var x = 0; x < mapWidth; x++) {
-            if(tiles[x][y].power) gamePowers.push([x, y]);
+            if (tiles[x][y].power) gamePowers.push([x, y]);
             if (tiles[x][y].solid || tiles[x][y].block || tiles[x][y].power) continue;
             gameCoins.push([x, y]);
         }
     }
-    
 }
 
 function createGhosts() {
@@ -250,7 +270,7 @@ function createGhosts() {
         [1, 1], [25, 1], [6, 11], [20, 11]
     ];
 
-    for(var i = 0; i < ghostsColors.length; i++) {
+    for (var i = 0; i < ghostsColors.length; i++) {
         var ghost = new Ghost(ghostsColors[i], 11 * tileSize, 5 * tileSize, targets[i][0], targets[i][1]);
         ghosts.push(ghost);
         break;

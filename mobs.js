@@ -55,7 +55,6 @@ class Ghost {
     }
 
     update() {
-        console.log(this.spectre);
         if ((this.x + this.y) % tileSize == 0) {
             // Control Spectre Mode
             if(this.spectre && this.speed == this.mainSpeed) this.speed = spectreSpeed;
@@ -150,6 +149,11 @@ class Ghost {
         
         var facesArray1 = this.spectre ? spectreFaces1 : this.faces1;
         var facesArray2 = this.spectre ? spectreFaces2 : this.faces2;
+
+        if(spectreTime >= totalSpectreTime - 2 && (this.time % 46) >= 23) {
+            facesArray1 = spectreEndFaces1;
+            facesArray2 = spectreEndFaces2;
+        }
         this.face = (this.time % 40) >= 20 ? facesArray1[this.moveIndex] : facesArray2[this.moveIndex];
     }
 
@@ -225,8 +229,14 @@ function getSpectreFaces() {
         var image1 = "spectre_" + dir + "_1.png";
         var image2 = "spectre_" + dir + "_2.png";
 
+        var imageEnd1 = "spectre_end_" + dir + "_1.png";
+        var imageEnd2 = "spectre_end_" + dir + "_2.png";
+
         spectreFaces1.push(createImage(image1));
         spectreFaces2.push(createImage(image2));
+
+        spectreEndFaces1.push(createImage(imageEnd1));
+        spectreEndFaces2.push(createImage(imageEnd2));
     }
 }
 
