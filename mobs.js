@@ -2,7 +2,10 @@ const ghostsColors = [
     "red", "blue", "orange", "pink"
 ];
 const speeds = [
-    2.5, 2, 2, 2.5
+    3.125, 2.5, 2.5, 3.125
+];
+const beginTimes = [
+    0, 5, 10, 15
 ];
 
 const ghostsMoves = [
@@ -16,22 +19,31 @@ const dirs = [
 ];
 
 class Ghost {
-    constructor(color, xStart, yStart, xTarget, yTarget) {
+    constructor(color, xStart, yStart, xTarget, yTarget, beginTime) {
         this.x = xStart;
         this.y = yStart;
+        this.beginTime = beginTime;
+        this.beforeStart = true;
 
         this.spectre = false;
+        this.dead = false;
+        this.deadWay = null;
+
         this.xDir = 0;
         this.yDir = 0;
+
+        // Begin Variables
+        this.xStart = xStart;
+        this.yStart = yStart;
+
+        this.xTarget = xTarget;
+        this.yTarget = yTarget;
 
         this.moveIndex = 3;
         this.time = 0;
         this.firstTarget = false;
+        this.way = findWay(this, this.xTarget, this.yTarget);
         this.mode = "go-to-target";
-        this.way = findWay(this, xTarget, yTarget);
-        // this.firstTarget = true;
-        // this.mode = "go-random";
-        // this.way = null;
 
         this.color = color;
         this.init();
@@ -54,42 +66,87 @@ class Ghost {
         this.face = this.faces1[1];
     }
 
+    destroy() {
+        var index = ghostsColors.indexOf(this.color);
+        ghosts[index] = new Ghost(this.color, ghostBeginX, ghostBeginY, this.xTarget, this.yTarget, this.beginTime);
+    }
+
     update() {
+        this.time++;
+        this.updateTexture();
+        if(secondsTime < this.beginTime) return;
+
+        // Set Speed on Dead
+        if(this.dead && this.speed != deadSpeed && (this.x + this.y) % tileSize == 0) this.speed = deadSpeed;
+
+        // Destroy Ghost
+        if (this.dead && this.x == ghostBeginX && this.y == ghostBeginY) this.destroy();
+
+        // Player Caught Ghost
+        if (this.spectre) {
+            if (!this.dead && this.y == playerY && commonPixels(playerX, this.x, tileSize, tileSize) || this.x == playerX && commonPixels(playerY, this.y, tileSize, tileSize)) {
+                destroyedSpectres++;
+                
+                // Points scored by player
+                var scoredPoints = 100;
+                for(var i = 0; i < destroyedSpectres; i++) scoredPoints *= 2;
+                points += scoredPoints;
+                updatePoints();
+
+                spectreTimes[this.color] = 0;
+                clearInterval(spectreIntervals[this.color]);
+                spectreIntervals[this.color] = null;
+
+                this.x = Math.round(this.x / tileSize) * tileSize;
+                this.y = Math.round(this.y / tileSize) * tileSize;
+
+                var beginX = ghostBeginX / tileSize;
+                var beginY = ghostBeginY / tileSize;
+
+                this.xDir = 0;
+                this.yDir = 0;
+
+                this.dead = true;
+                this.spectre = false;
+                this.way = findWay(this, beginX, beginY);
+                this.mode = "go-to-begin";
+            }
+        }
+
         if ((this.x + this.y) % tileSize == 0) {
             // Control Spectre Mode
-            if(this.spectre && this.speed == this.mainSpeed) this.speed = spectreSpeed;
-            if(!this.spectre && this.speed == spectreSpeed) this.speed = this.mainSpeed;
+            if (this.spectre && this.speed == this.mainSpeed) this.speed = spectreSpeed;
+            if (!this.spectre && this.speed == spectreSpeed) this.speed = this.mainSpeed;
 
             if (this.firstTarget && this.mode == "go-random" && this.way == null) {
                 var random = getRandom(0, 11);
 
-                if (random == 11) {
+                if (random == 11 && !this.spectre) {
                     this.way = findWay(this, playerX / tileSize, playerY / tileSize);
                     this.mode = "go-to-target";
                 }
             }
 
-            if (this.mode == "go-to-target") this.goToTarget();
+            if (this.mode == "go-to-target" || this.mode == "go-to-begin") this.goToTarget();
             else if (this.mode == "go-random") this.goRandom();
-
         }
-        
-        if((this.x + this.y) % tileSize == 0) {
+
+        if ((this.x + this.y) % tileSize == 0) {
             var moveX = this.x / tileSize + this.xDir;
             var moveY = this.y / tileSize + this.yDir;
-            
-            if(tiles[moveX] && tiles[moveX][moveY] && !tiles[moveX][moveY].solid) {
+
+            if (tiles[moveX] && tiles[moveX][moveY] && !tiles[moveX][moveY].solid) {
                 this.move();
             } else {
                 this.xDir = -this.xDir;
                 this.yDir = -this.yDir
-                this.mode = "go-random";
+                if (!this.dead) {
+                    this.mode = "go-random";
+                }
             }
         } else {
             this.move();
         }
-        this.time++;
-        this.updateTexture();
     }
 
     goRandom() {
@@ -142,23 +199,24 @@ class Ghost {
     updateTexture() {
         var moveIndex = -1;
 
-        for(var i = 0; i < ghostsMoves.length; i++) {
-            if(this.xDir == ghostsMoves[i][0] && this.yDir == ghostsMoves[i][1]) moveIndex = i;
+        for (var i = 0; i < ghostsMoves.length; i++) {
+            if (this.xDir == ghostsMoves[i][0] && this.yDir == ghostsMoves[i][1]) moveIndex = i;
         }
-        if(moveIndex != -1) this.moveIndex = moveIndex;
-        
+        if (moveIndex != -1) this.moveIndex = moveIndex;
+
         var facesArray1 = this.spectre ? spectreFaces1 : this.faces1;
         var facesArray2 = this.spectre ? spectreFaces2 : this.faces2;
 
-        if(spectreTime >= totalSpectreTime - 2 && (this.time % 46) >= 23) {
+        if (this.spectre && spectreTimes[this.color] >= totalSpectreTime - 2 && (this.time % 46) >= 23) {
             facesArray1 = spectreEndFaces1;
             facesArray2 = spectreEndFaces2;
         }
-        this.face = (this.time % 40) >= 20 ? facesArray1[this.moveIndex] : facesArray2[this.moveIndex];
+        if (this.dead) this.face = deadFaces[this.moveIndex];
+        else this.face = (this.time % 40) >= 20 ? facesArray1[this.moveIndex] : facesArray2[this.moveIndex];
     }
 
     move() {
-        if(!winner) {
+        if (!winner) {
             this.x += this.speed * this.xDir;
             this.y += this.speed * this.yDir;
         }
@@ -177,9 +235,12 @@ function findWay(ghost, xPos, yPos) {
         }
     }
 
+    xPos = Math.round(xPos);
+    yPos = Math.round(yPos);
+
     // Position Variables
-    var ghostX = ghost.x / tileSize;
-    var ghostY = ghost.y / tileSize;
+    var ghostX = Math.round(ghost.x / tileSize);
+    var ghostY = Math.round(ghost.y / tileSize);
 
     var ghostPos = [ghostX, ghostY];
     var playerPos = [xPos, yPos];
@@ -228,12 +289,14 @@ function getSpectreFaces() {
     for (var dir of dirs) {
         var image1 = "spectre_" + dir + "_1.png";
         var image2 = "spectre_" + dir + "_2.png";
+        var deadImage = "eyes_" + dir + ".png";
 
         var imageEnd1 = "spectre_end_" + dir + "_1.png";
         var imageEnd2 = "spectre_end_" + dir + "_2.png";
 
         spectreFaces1.push(createImage(image1));
         spectreFaces2.push(createImage(image2));
+        deadFaces.push(createImage(deadImage));
 
         spectreEndFaces1.push(createImage(imageEnd1));
         spectreEndFaces2.push(createImage(imageEnd2));
@@ -244,4 +307,23 @@ function absMove(move) {
     var xMove = Math.abs(move[0]);
     var yMove = Math.abs(move[1]);
     return [xMove, yMove];
+}
+
+function commonPixels(firstCoord, secondCoord, firstSize, secondSize) {
+    var firstPoints = [];
+    var secondPoints = [];
+
+    for (var first = firstCoord + 1; first < firstCoord + firstSize; first++) {
+        firstPoints.push(first);
+    }
+    for (var second = secondCoord + 1; second < secondCoord + secondSize; second++) {
+        secondPoints.push(second);
+    }
+
+    for (var first of firstPoints) {
+        for (var second of secondPoints) {
+            if (first == second) return true;
+        }
+    }
+    return false;
 }

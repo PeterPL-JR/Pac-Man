@@ -1,6 +1,9 @@
 var elem = getId("game-canvas");
 var canvas = elem.getContext("2d");
 
+var healthPointsDiv = getId("health-points");
+var pointsDiv = getId("points");
+
 const tileSize = 50;
 var tiles = [];
 const ghosts = [];
@@ -10,15 +13,24 @@ var gamePowers = [];
 var yourCoins = 0;
 
 // Player Data
-var playerColor = "yellow";
-const speed = 2.5;
+const speed = 3.125;
 const eatTime = 16;
-const spectreSpeed = 1;
+
+const spectreSpeed = 2;
+const deadSpeed = 10;
+var pacmans = 3;
+var points = 0;
+var destroyedSpectres = 0;
+
+// Points Data
+const pointsForCoin = 10;
+const pointsForPower = 50;
 
 // Movement Data
 var xDir = 0;
 var yDir = 0;
 
+// 13/11
 var playerX = 13 * tileSize;
 var playerY = 11 * tileSize;
 var nextMove = null;
@@ -35,8 +47,13 @@ const allTheRightMoves = {
 };
 
 const onAllTheRightFaces = {};
+const totalSpectreTime = 11;
+
+const ghostBeginX = 13 * tileSize;
+const ghostBeginY = 5 * tileSize;
 
 var time = 0;
+var secondsTime = 0;
 var controlling = true;
 var beginImage;
 
@@ -61,60 +78,22 @@ var mapImages;
 // Spectre Variables
 var spectreFaces1 = [];
 var spectreFaces2 = [];
+var deadFaces = [];
 
 var spectreEndFaces1 = [];
 var spectreEndFaces2 = [];
 
-const totalSpectreTime = 11;
-var spectreTime = 0;
-var spectreInterval = null;
-
-function init() {
-    for (var i = 0; i < 4; i++) onAllTheRightFaces[movingKeys[i]] = createImage("player_" + dirs[i] + ".png");
-    beginImage = onAllTheRightFaces["D"];
-
-    // Load Images
-    fullPlayerImage = createImage("player_full.png");
-    coinImage = createImage("coin.png");
-    powerImage = createImage("power.png");
-    getSpectreFaces();
-
-    connectMap(1, function (array) {
-        // Size Variables
-        mapWidth = array['width'];
-        mapHeight = array['height'];
-
-        width = mapWidth * tileSize;
-        height = mapHeight * tileSize;
-
-        // Canvas Size
-        elem.width = width;
-        elem.height = height;
-
-        elem.style.width = width + "px";
-        elem.style.height = height + "px";
-
-        canvas.fillStyle = "black";
-        canvas.fillRect(0, 0, width, height);
-
-        tiles = createMapTiles(array['map'], mapWidth, mapHeight);
-        createGhosts();
-
-        createMapImages(function () {
-            document.body.onkeydown = function (event) {
-                var key = event.key.toUpperCase();
-                if (controlling && !winner && !over && movingKeys.indexOf(key) != -1) {
-                    nextMove = key;
-                }
-            }
-            createCoins();
-            draw();
-        });
-    });
-}
+var spectreIntervals = [];
+var spectreTimes = [];
 
 function draw() {
     requestAnimationFrame(draw);
+
+    var spectresSum = 0;
+    for(var ghost of ghosts) {
+        if(ghost.spectre) spectresSum++;
+    }
+    if(spectresSum == 0) destroyedSpectres = 0;
 
     time++;
     controlling = (playerX < 0 || playerX + tileSize > width) ? false : true;
@@ -129,7 +108,7 @@ function draw() {
             var tileX = playerX / tileSize + xBufferDir;
             var tileY = playerY / tileSize + yBufferDir;
 
-            if (!tiles[tileX][tileY].solid) {
+            if (!(tiles[tileX][tileY].solid || tileX == 13 && tileY == 4)) {
                 xDir = xBufferDir;
                 yDir = yBufferDir;
 
@@ -148,7 +127,7 @@ function draw() {
         var tileX = playerX / tileSize + xDir;
         var tileY = playerY / tileSize + yDir;
 
-        if (tiles[tileX] && tiles[tileX][tileY] && tiles[tileX][tileY].solid) {
+        if (tiles[tileX] && tiles[tileX][tileY] && (tiles[tileX][tileY].solid || tileX == 13 && tileY == 4)) {
             xDir = 0;
             yDir = 0;
         }
@@ -161,6 +140,8 @@ function draw() {
             canvas.drawImage(mapImages[index], x * tileSize, y * tileSize);
         }
     }
+    canvas.fillStyle = "#ffafa4";
+    canvas.fillRect(13 * tileSize - 11, 4 * tileSize + 20, 73, 9);
 
     // Render Coins
     for (var coin of gameCoins) {
@@ -169,6 +150,13 @@ function draw() {
     // Render Powers
     for (var power of gamePowers) {
         canvas.drawImage(powerImage, power[0] * tileSize, power[1] * tileSize);
+    }
+
+    // Render Ghosts
+    for (var ghost of ghosts) {
+        ghost.update();
+        canvas.drawImage(ghost.face, ghost.x, ghost.y);
+        // break;
     }
 
     var playerImage = (xDir == 0 && yDir == 0) ? fullPlayerImage : playerNowImage;
@@ -185,26 +173,25 @@ function draw() {
             return (obj[0] == playerX / tileSize) && (obj[1] == playerY / tileSize);
         });
 
+        // Take a Coin
         if (coinIndex != -1) {
             gameCoins.splice(coinIndex, 1);
             yourCoins++;
+            points += pointsForCoin;
+            updatePoints();
 
             // If Player wins a game
             if (gameCoins.length == 0) {
                 winGame();
             }
         }
+        // Take a Power
         if (powerIndex != -1) {
             gamePowers.splice(powerIndex, 1);
+            points += pointsForPower;
+            updatePoints();
             setSpectreMode();
         }
-    }
-
-    // Render Ghosts
-    for (var ghost of ghosts) {
-        ghost.update();
-        canvas.drawImage(ghost.face, ghost.x, ghost.y);
-        // break;
     }
 
     // Print
@@ -232,62 +219,41 @@ function draw() {
     }
 }
 
+function updateHealth() {
+    // Player Health Points
+    for(var i = 0; i < pacmans - 1; i++) {
+        var img = document.createElement("img");
+        img.src = "images/player_left.png";
+        img.className = "health-point";
+        healthPointsDiv.appendChild(img);
+    }
+}
+
+function updatePoints() {
+    pointsDiv.innerHTML = points;
+}
+
 function setSpectreMode() {
-    if (spectreInterval == null) {
-        for (var ghost of ghosts) {
-            ghost.spectre = true;
-        }
-
-        spectreInterval = setInterval(function () {
-            spectreTime++;
-
-            if (spectreTime > totalSpectreTime) {
-                for (var i = 0; i < ghosts.length; i++) ghosts[i].spectre = false;
-                spectreTime = 0;
-
-                clearInterval(spectreInterval);
-                spectreInterval = null;
-            }
-        }, 1000);
-    } else {
-        spectreTime = 0;
+    for (var ghost of ghosts) {
+        setSpectre(ghost);
     }
 }
 
-function createCoins() {
-    // Create Coins on the map
-    for (var y = 0; y < mapHeight; y++) {
-        for (var x = 0; x < mapWidth; x++) {
-            if (tiles[x][y].power) gamePowers.push([x, y]);
-            if (tiles[x][y].solid || tiles[x][y].block || tiles[x][y].power) continue;
-            gameCoins.push([x, y]);
+function setSpectre(ghost) {
+    clearInterval(spectreIntervals[ghost.color]);
+    spectreTimes[ghost.color] = 0;
+    ghost.spectre = true;
+
+    spectreIntervals[ghost.color] = setInterval(function () {
+        spectreTimes[ghost.color]++;
+
+        if (spectreTimes[ghost.color] > totalSpectreTime) {
+            clearInterval(spectreIntervals[ghost.color]);
+            spectreIntervals[ghost.color] = null;
+            spectreTimes[ghost.color] = 0;
+            ghost.spectre = false;
         }
-    }
-}
-
-function createGhosts() {
-    var targets = [
-        [1, 1], [25, 1], [6, 11], [20, 11]
-    ];
-
-    for (var i = 0; i < ghostsColors.length; i++) {
-        var ghost = new Ghost(ghostsColors[i], 11 * tileSize, 5 * tileSize, targets[i][0], targets[i][1]);
-        ghosts.push(ghost);
-        // break;
-    }
-}
-
-function createMapImages(onload) {
-    serverGet("connect.php", { query: "tiles" }, function (text) {
-        var links = JSON.parse(text);
-        mapImages = [];
-
-        for (var link of links) {
-            var image = createImage("tiles/" + link);
-            mapImages.push(image);
-        }
-        onload();
-    });
+    }, 1000);
 }
 
 function winGame() {
