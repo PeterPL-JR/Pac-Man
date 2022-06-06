@@ -71,7 +71,6 @@ function createGhosts() {
     ];
 
     for (var i = 0; i < ghostsColors.length; i++) {
-        // if(i != 1) continue;
         var startX = 11 * tileSize + i * tileSize;
         var startY = 5 * tileSize;
 
@@ -82,6 +81,7 @@ function createGhosts() {
 
         var ghost = new Ghost(ghostsColors[i], startX, startY, targets[i][0], targets[i][1], beginTimes[i]);
         ghosts.push(ghost);
+        // break;
     }
 }
 

@@ -13,10 +13,10 @@ var gamePowers = [];
 var yourCoins = 0;
 
 // Player Data
-const speed = 3.125;
+const speed = 2.5;
 const eatTime = 16;
 
-const spectreSpeed = 2;
+const spectreSpeed = 1;
 const deadSpeed = 10;
 var pacmans = 3;
 var points = 0;
@@ -64,6 +64,7 @@ var powerImage;
 
 var winner = false;
 var over = false;
+var playerDead = false;
 
 // Screen & Map Data
 var mapWidth;
@@ -118,7 +119,7 @@ function draw() {
         }
     }
 
-    if (!winner && !over) {
+    if (!winner && !over && !playerDead) {
         playerX += speed * xDir;
         playerY += speed * yDir;
     }
@@ -162,7 +163,7 @@ function draw() {
     var playerImage = (xDir == 0 && yDir == 0) ? fullPlayerImage : playerNowImage;
     var renderingImage = time % eatTime >= (eatTime * (4 / 9)) ? playerImage : fullPlayerImage;
 
-    if (winner || over) renderingImage = fullPlayerImage;
+    if (winner || over || playerDead) renderingImage = fullPlayerImage;
     canvas.drawImage(renderingImage, playerX, playerY);
 
     if ((playerX + playerY) % 50 == 0) {
@@ -221,6 +222,7 @@ function draw() {
 
 function updateHealth() {
     // Player Health Points
+    healthPointsDiv.innerHTML = "";
     for(var i = 0; i < pacmans - 1; i++) {
         var img = document.createElement("img");
         img.src = "images/player_left.png";
@@ -258,4 +260,23 @@ function setSpectre(ghost) {
 
 function winGame() {
     winner = true;
+}
+
+function losePoint() {
+    playerDead = true;
+    setTimeout(function() {
+        pacmans--;
+        playerDead = false;
+        updateHealth();
+
+        ghosts.splice(0, 4);
+        createGhosts();
+
+        playerX = 13 * tileSize;
+        playerY = 11 * tileSize;
+    }, 1000);
+}
+
+function gameOver() {
+
 }

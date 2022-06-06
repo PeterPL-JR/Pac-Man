@@ -2,7 +2,7 @@ const ghostsColors = [
     "red", "blue", "orange", "pink"
 ];
 const speeds = [
-    3.125, 2.5, 2.5, 3.125
+    2, 2, 2, 2
 ];
 const beginTimes = [
     0, 5, 10, 15
@@ -74,22 +74,21 @@ class Ghost {
     update() {
         this.time++;
         this.updateTexture();
-        if(secondsTime < this.beginTime) return;
+        if (secondsTime < this.beginTime || playerDead) return;
 
         // Set Speed on Dead
-        if(this.dead && this.speed != deadSpeed && (this.x + this.y) % tileSize == 0) this.speed = deadSpeed;
+        if (this.dead && this.speed != deadSpeed && (this.x + this.y) % tileSize == 0) this.speed = deadSpeed;
 
         // Destroy Ghost
         if (this.dead && this.x == ghostBeginX && this.y == ghostBeginY) this.destroy();
 
-        // Player Caught Ghost
-        if (this.spectre) {
-            if (!this.dead && this.y == playerY && commonPixels(playerX, this.x, tileSize, tileSize) || this.x == playerX && commonPixels(playerY, this.y, tileSize, tileSize)) {
+        if (!this.dead && (this.y == playerY && commonPixels(playerX, this.x, tileSize, tileSize) || this.x == playerX && commonPixels(playerY, this.y, tileSize, tileSize))) {
+            if (this.spectre) {
                 destroyedSpectres++;
-                
+
                 // Points scored by player
                 var scoredPoints = 100;
-                for(var i = 0; i < destroyedSpectres; i++) scoredPoints *= 2;
+                for (var i = 0; i < destroyedSpectres; i++) scoredPoints *= 2;
                 points += scoredPoints;
                 updatePoints();
 
@@ -110,6 +109,8 @@ class Ghost {
                 this.spectre = false;
                 this.way = findWay(this, beginX, beginY);
                 this.mode = "go-to-begin";
+            } else {
+                losePoint();
             }
         }
 
