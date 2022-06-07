@@ -74,7 +74,7 @@ class Ghost {
     update() {
         this.time++;
         this.updateTexture();
-        if (secondsTime < this.beginTime || playerDead || over || preWinner) return;
+        if (secondsTime < this.beginTime || pre || playerDead || over || preWinner) return;
 
         // Set Speed on Dead
         if (this.dead && this.speed != deadSpeed && (this.x + this.y) % tileSize == 0) this.speed = deadSpeed;

@@ -36,6 +36,7 @@ var yDir = 0;
 var playerX = 13 * tileSize;
 var playerY = 11 * tileSize;
 var nextMove = null;
+var secondsInterval = null;
 
 const movingKeys = [
     "W", "S", "A", "D"
@@ -63,6 +64,9 @@ var fullPlayerImage;
 var playerNowImage;
 var coinImage;
 var powerImage;
+
+var pre = true;
+var preRenderGhosts = false;
 
 var preWinner = false;
 var winner = false;
@@ -94,14 +98,21 @@ var spectreTimes = [];
 
 function draw() {
     requestAnimationFrame(draw);
-    
+
+    if(secondsInterval == null && !pre) {   
+        // Time Interval
+        secondsInterval = setInterval(function () {
+            secondsTime++;
+        }, 1000);
+    }
+
     var spectresSum = 0;
     for(var ghost of ghosts) {
         if(ghost.spectre) spectresSum++;
     }
     if(spectresSum == 0) destroyedSpectres = 0;
 
-    time++;
+    if(!pre) time++;
     controlling = (playerX < 0 || playerX + tileSize > width) ? false : true;
 
     if ((playerX + playerY) % 50 == 0) {
@@ -124,7 +135,7 @@ function draw() {
         }
     }
 
-    if (!winner && !over && !playerDead) {
+    if (!winner && !over && !playerDead && !preWinner && !winner) {
         playerX += speed * xDir;
         playerY += speed * yDir;
     }
@@ -160,7 +171,7 @@ function draw() {
     }
 
     // Render Ghosts
-    if(!winner && !over) {
+    if(!winner && !over && preRenderGhosts) {
         for (var ghost of ghosts) {
             ghost.update();
             canvas.drawImage(ghost.face, ghost.x, ghost.y);
@@ -171,9 +182,15 @@ function draw() {
     var playerImage = (xDir == 0 && yDir == 0) ? fullPlayerImage : playerNowImage;
     var renderingImage = time % eatTime >= (eatTime * (4 / 9)) ? playerImage : fullPlayerImage;
 
-    if (winner || over || playerDead) renderingImage = fullPlayerImage;
+    if (preWinner || winner || over || playerDead) renderingImage = fullPlayerImage;
     if(!winner && !over) canvas.drawImage(renderingImage, playerX, playerY);
 
+    // Start Game Text
+    if(pre) {
+        canvas.fillStyle = "yellow";
+        canvas.font = "bold 42px Verdana";
+        canvas.fillText("READY!", 590, 392);
+    }
 
     // Winner Text
     if(winner) {
@@ -311,6 +328,7 @@ function losePoint() {
     playerDead = true;
     setTimeout(function() {
         pacmans--;
+        secondsTime = 0;
         playerDead = false;
         updateHealth();
 
@@ -328,6 +346,8 @@ function losePoint() {
 
 function gameOver() {
     over = true;
+    xDir = 0;
+    yDir = 0;
 
     setTimeout(function() {
         window.location.href = "";

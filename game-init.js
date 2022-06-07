@@ -37,7 +37,7 @@ function init() {
         createMapImages(function () {
             document.body.onkeydown = function (event) {
                 var key = event.key.toUpperCase();
-                if (controlling && !winner && !over && !preWinner && movingKeys.indexOf(key) != -1) {
+                if (controlling && !pre && !winner && !over && !preWinner && movingKeys.indexOf(key) != -1) {
                     nextMove = key;
                 }
             }
@@ -48,9 +48,17 @@ function init() {
     updateHealth();
     updatePoints();
 
-    // Time Interval
-    setInterval(function () {
-        secondsTime++;
+    // Start Game
+    var counter = 0;
+    var preInterval =setInterval(function() {
+        counter++;
+        if(counter == 3) {
+            preRenderGhosts = true;
+        }
+        if(counter >= 5) {
+            clearInterval(preInterval);
+            pre = false;
+        }
     }, 1000);
 }
 
