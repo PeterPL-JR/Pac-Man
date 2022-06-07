@@ -1,8 +1,10 @@
 var elem = getId("game-canvas");
 var canvas = elem.getContext("2d");
 
+var content = getId("content");
 var healthPointsDiv = getId("health-points");
 var pointsDiv = getId("points");
+var gameOverDiv = getId("game-over");
 
 const tileSize = 50;
 var tiles = [];
@@ -154,17 +156,26 @@ function draw() {
     }
 
     // Render Ghosts
-    for (var ghost of ghosts) {
-        ghost.update();
-        canvas.drawImage(ghost.face, ghost.x, ghost.y);
-        // break;
+    if(!winner && !over) {
+        for (var ghost of ghosts) {
+            ghost.update();
+            canvas.drawImage(ghost.face, ghost.x, ghost.y);
+            // break;
+        }
     }
 
     var playerImage = (xDir == 0 && yDir == 0) ? fullPlayerImage : playerNowImage;
     var renderingImage = time % eatTime >= (eatTime * (4 / 9)) ? playerImage : fullPlayerImage;
 
     if (winner || over || playerDead) renderingImage = fullPlayerImage;
-    canvas.drawImage(renderingImage, playerX, playerY);
+    if(!over) canvas.drawImage(renderingImage, playerX, playerY);
+
+    // Game Over Text
+    if(over) {
+        canvas.fillStyle = "red";
+        canvas.font = "bold 42px Verdana";
+        canvas.fillText("GAME OVER", 535, 392);
+    }
 
     if ((playerX + playerY) % 50 == 0) {
         var coinIndex = gameCoins.findIndex(function (obj) {
@@ -263,6 +274,9 @@ function winGame() {
 }
 
 function losePoint() {
+    xDir = 0;
+    yDir = 0;
+
     playerDead = true;
     setTimeout(function() {
         pacmans--;
@@ -274,9 +288,30 @@ function losePoint() {
 
         playerX = 13 * tileSize;
         playerY = 11 * tileSize;
+
+        if(pacmans <= 0) {
+            gameOver();
+        }
     }, 1000);
 }
 
 function gameOver() {
+    over = true;
 
+    content.onmousemove = function(event) {
+        var x = event.x - content.offsetLeft;
+        var y = event.y - content.offsetTop;
+        content.style.cursor = rightCursorPos(x, y) ? "pointer" : "default";        
+    }
+
+    content.onmousedown = function(event) {
+        var x = event.x - content.offsetLeft;
+        var y = event.y - content.offsetTop;
+    
+        if(rightCursorPos(x, y)) window.location.href = "";
+    }
+}
+
+function rightCursorPos(x, y) {
+    return x > 530 && x < 810 && y > 355 && y < 390;
 }
