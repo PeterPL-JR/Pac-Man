@@ -64,9 +64,11 @@ var playerNowImage;
 var coinImage;
 var powerImage;
 
+var preWinner = false;
 var winner = false;
 var over = false;
 var playerDead = false;
+var winnerColors = false;
 
 // Screen & Map Data
 var mapWidth;
@@ -77,6 +79,7 @@ var height;
 
 var mapPixels;
 var mapImages;
+var winnerImages;
 
 // Spectre Variables
 var spectreFaces1 = [];
@@ -91,7 +94,7 @@ var spectreTimes = [];
 
 function draw() {
     requestAnimationFrame(draw);
-
+    
     var spectresSum = 0;
     for(var ghost of ghosts) {
         if(ghost.spectre) spectresSum++;
@@ -140,7 +143,8 @@ function draw() {
     for (var x = 0; x < mapWidth; x++) {
         for (var y = 0; y < mapHeight; y++) {
             var index = tiles[x][y].tile;
-            canvas.drawImage(mapImages[index], x * tileSize, y * tileSize);
+            var imagesArray = winnerColors ? winnerImages : mapImages;
+            canvas.drawImage(imagesArray[index], x * tileSize, y * tileSize);
         }
     }
     canvas.fillStyle = "#ffafa4";
@@ -168,7 +172,15 @@ function draw() {
     var renderingImage = time % eatTime >= (eatTime * (4 / 9)) ? playerImage : fullPlayerImage;
 
     if (winner || over || playerDead) renderingImage = fullPlayerImage;
-    if(!over) canvas.drawImage(renderingImage, playerX, playerY);
+    if(!winner && !over) canvas.drawImage(renderingImage, playerX, playerY);
+
+
+    // Winner Text
+    if(winner) {
+        canvas.fillStyle = "yellow";
+        canvas.font = "bold 45px Verdana";
+        canvas.fillText("VICTORY!", 560, 392);
+    }
 
     // Game Over Text
     if(over) {
@@ -270,7 +282,26 @@ function setSpectre(ghost) {
 }
 
 function winGame() {
-    winner = true;
+    preWinner = true;
+    xDir = 0;
+    yDir = 0;
+
+    var counter = 0;
+    var interval = null;
+    
+    setTimeout(function() {
+        winner = true;
+        interval = setInterval(function() {
+            winnerColors = counter % 2 == 0;
+            counter++;
+            if(counter >= 6) {
+                clearInterval(interval);
+                setTimeout(function() {
+                    window.location.href = "";
+                }, 1000);
+            } 
+        }, 250);
+    }, 1000);
 }
 
 function losePoint() {
@@ -298,18 +329,9 @@ function losePoint() {
 function gameOver() {
     over = true;
 
-    content.onmousemove = function(event) {
-        var x = event.x - content.offsetLeft;
-        var y = event.y - content.offsetTop;
-        content.style.cursor = rightCursorPos(x, y) ? "pointer" : "default";        
-    }
-
-    content.onmousedown = function(event) {
-        var x = event.x - content.offsetLeft;
-        var y = event.y - content.offsetTop;
-    
-        if(rightCursorPos(x, y)) window.location.href = "";
-    }
+    setTimeout(function() {
+        window.location.href = "";
+    }, 2000);
 }
 
 function rightCursorPos(x, y) {

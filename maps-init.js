@@ -66,6 +66,7 @@ function createMapTiles(pixels, mapWidth, mapHeight) {
 
     for(var x = 0; x < mapWidth; x++) {
         tiles[x] = [];
+
         for(var y = 0; y < mapHeight; y++) {
             var block = (pixels[x][y] == -11);
             var power = (pixels[x][y] == -4);
@@ -82,4 +83,8 @@ function createMapTiles(pixels, mapWidth, mapHeight) {
         }
     }
     return tiles;
+}
+
+function rightCursorPos(x, y) {
+    return x > 530 && x < 810 && y > 355 && y < 390;
 }

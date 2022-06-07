@@ -37,7 +37,7 @@ function init() {
         createMapImages(function () {
             document.body.onkeydown = function (event) {
                 var key = event.key.toUpperCase();
-                if (controlling && !winner && !over && movingKeys.indexOf(key) != -1) {
+                if (controlling && !winner && !over && !preWinner && movingKeys.indexOf(key) != -1) {
                     nextMove = key;
                 }
             }
@@ -89,10 +89,14 @@ function createMapImages(onload) {
     serverGet("connect.php", { query: "tiles" }, function (text) {
         var links = JSON.parse(text);
         mapImages = [];
+        winnerImages = [];
 
         for (var link of links) {
             var image = createImage("tiles/" + link);
             mapImages.push(image);
+
+            var winnerImage = createImage("tiles/winner/" + link);
+            winnerImages.push(winnerImage);
         }
         onload();
     });
