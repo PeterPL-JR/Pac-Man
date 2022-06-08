@@ -1,3 +1,6 @@
+var logged = false;
+var level = null;
+
 function init() {
     for (var i = 0; i < 4; i++) onAllTheRightFaces[movingKeys[i]] = createImage("player_" + dirs[i] + ".png");
     beginImage = onAllTheRightFaces["D"];
@@ -13,36 +16,46 @@ function init() {
     powerImage = createImage("power.png");
     getSpectreFaces();
 
-    connectMap(1, function (array) {
-        // Size Variables
-        mapWidth = array['width'];
-        mapHeight = array['height'];
+    serverGet("connect.php", {query: "get-level"}, function(text) {
+        var levelNumber = parseInt(text);
+        if(isNaN(levelNumber)) levelNumber = 1;
+        else {
+            logged = true;
+            getId("level-name").innerHTML = "Level " + levelNumber;
+        }
+        level = levelNumber;
 
-        width = mapWidth * tileSize;
-        height = mapHeight * tileSize;
-
-        // Canvas Size
-        elem.width = width;
-        elem.height = height;
-
-        elem.style.width = width + "px";
-        elem.style.height = height + "px";
-
-        canvas.fillStyle = "black";
-        canvas.fillRect(0, 0, width, height);
-
-        tiles = createMapTiles(array['map'], mapWidth, mapHeight);
-        createGhosts();
-
-        createMapImages(function () {
-            document.body.onkeydown = function (event) {
-                var key = event.key.toUpperCase();
-                if (controlling && !pre && !winner && !over && !preWinner && movingKeys.indexOf(key) != -1) {
-                    nextMove = key;
+        connectMap(levelNumber, function (array) {
+            // Size Variables
+            mapWidth = array['width'];
+            mapHeight = array['height'];
+    
+            width = mapWidth * tileSize;
+            height = mapHeight * tileSize;
+    
+            // Canvas Size
+            elem.width = width;
+            elem.height = height;
+    
+            elem.style.width = width + "px";
+            elem.style.height = height + "px";
+    
+            canvas.fillStyle = "black";
+            canvas.fillRect(0, 0, width, height);
+    
+            tiles = createMapTiles(array['map'], mapWidth, mapHeight);
+            createGhosts();
+    
+            createMapImages(function () {
+                document.body.onkeydown = function (event) {
+                    var key = event.key.toUpperCase();
+                    if (controlling && !pre && !winner && !over && !preWinner && movingKeys.indexOf(key) != -1) {
+                        nextMove = key;
+                    }
                 }
-            }
-            createCoins();
-            draw();
+                createCoins();
+                draw();
+            });
         });
     });
     updateHealth();

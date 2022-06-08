@@ -1,0 +1,80 @@
+body {
+    background-color: #080808;
+}
+
+*::selection {
+    background-color: #0000;
+}
+
+#content {
+    position: relative;
+    width: 1350px;
+    height: max-content;
+
+    margin: auto;
+    margin-top: 100px;
+}
+
+#health-points {
+    width: 46%;
+    height: 50px;
+
+    float: left;
+    padding-left: 4%;
+}
+#points {
+    width: 46%;
+    float: left;
+
+    color: white;
+    text-align: right;
+    padding-right: 4%;
+    font: bold 60px 'Verdana';
+}
+
+.health-point {
+    float: left;
+
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#game-over {
+    position: relative;
+    display: none;
+    width: 350px;
+    height: 50px;
+
+    font: bold 36px 'Verdana';
+    text-align: center;
+    line-height: 50px;
+    background-color: black;
+    color: red;
+
+    left: 500px;
+    top: 350px;
+}
+
+#button {
+    position: fixed;
+    cursor: pointer;
+    right: 0px;
+    top: 0px;
+
+    width: 80px;
+    margin: 20px;
+}
+#button:hover {
+    filter: invert(100%);
+    width: 100px;
+}
+
+#level-name {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+
+    font: bold 50px 'Verdana';
+    color: white;
+    padding: 20px;
+}

@@ -308,13 +308,19 @@ function winGame() {
     
     setTimeout(function() {
         winner = true;
+        points += (pacmans - 1) * 500;
+        updatePoints();
+
         interval = setInterval(function() {
             winnerColors = counter % 2 == 0;
             counter++;
             if(counter >= 6) {
                 clearInterval(interval);
+
                 setTimeout(function() {
-                    window.location.href = "";
+                    serverGet("connect.php", {query: "save-score", points: points, level: level}, function(text) {
+                        window.location.href = logged ? "welcome.php" : "";
+                    });
                 }, 1000);
             } 
         }, 250);
@@ -350,7 +356,7 @@ function gameOver() {
     yDir = 0;
 
     setTimeout(function() {
-        window.location.href = "";
+        window.location.href = logged ? "welcome.php" : "";
     }, 2000);
 }
 

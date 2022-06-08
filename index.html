@@ -2,17 +2,26 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Pac-Man</title>
-    <link rel="stylesheet" href="game-style.css" type="text/css">
+    <title>PacMan</title>
+    <link rel="icon" href="images/player_right.png">
+    <link rel="stylesheet" href="styles/game-style.css" type="text/css">
     <script src="library.js"></script>
+    <style>
+        .disclaimer {
+            display: none !important;
+        }
+    </style>
 </head>
 <body onload="init();">
     <div id="content">
         <canvas id="game-canvas"></canvas>
-
+        
         <div id="health-points"></div>
         <div id="points"></div>
     </div>
+    <a href="login.php"><img src="images/pacman2.png" id="button"></a>
+    <div id="level-name"></div>
+
     <script src="game-init.js"></script>
     <script src="mobs.js"></script>
 

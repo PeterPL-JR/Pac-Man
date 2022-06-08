@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>PacMan - Login</title>
     <link rel="icon" href="images/player_right.png">
-    <link rel="stylesheet" type="text/css" href="php-style.css">
+    <link rel="stylesheet" type="text/css" href="styles/php-style.css">
+    <link rel="stylesheet" href="styles/styl.css" type="text/css">
 </head>
 <body>
     <img src="images/pacman1.png" id="pacman1">
@@ -18,13 +19,21 @@
             <input type="text" placeholder="Enter your login here" name="login" id="login">
             <p id="txt">Password</p>
             <input type="password" placeholder="Enter your password here" name="password" id="password">
+            <div style="margin-top:55px; margin-left:50px;"><span style="color:white; font-size:20px;">You don't have account yet? </span>
+            <a href="create-acc.php" id="link">Create one here.</a></div>
             <input type="submit" value="Login" id="btn">
         </form>
     </div>
 </body>
 </html>
 <?php
-session_start();
+if(!isset($_COOKIE['zalogowany'])) {
+    $_COOKIE['zalogowany'] = "false";
+}
+if($_COOKIE['zalogowany'] == "true") {
+    header("Location: welcome.php");
+}
+
     if(isset($_POST["login"]) && isset($_POST["password"]))
     {
         if($_POST["login"] != "" && $_POST["password"] != "")
@@ -41,12 +50,14 @@ session_start();
                     $query2 = mysqli_query($base, "SELECT users.nick FROM users WHERE users.login = '$login' AND users.password = '$hash';");
                     $user = mysqli_fetch_assoc($query2);
                     $name = $user["nick"];
-                    $_SESSION["zalogowany"] = true;
-                    $_SESSION["nick"] = $name;
+
+                    setcookie("zalogowany", "true");
+                    setcookie("nick", $name);
+                    setcookie("login", $login);
                     header("location: welcome.php");
                 }
             }
         }
-            echo "<div style='width:150px; height:90px; margin:auto; margin-top:-120px; text-align:center;'><h1 style='color:red; font-size:40px;'>". "Error". "</h1></div>";
+        echo "<div style='width:150px; height:90px; margin:auto; margin-top:-120px; text-align:center;'><h1 style='color:red; font-size:40px;'>". "Error". "</h1></div>";
     }
 ?>

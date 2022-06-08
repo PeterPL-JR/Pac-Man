@@ -1,0 +1,79 @@
+*{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+html {
+    height: 100%;
+}
+body {
+    background: linear-gradient(to left top, rgb(0, 4, 21), rgb(68, 66, 66));
+}
+
+div#main{
+    background-color: black;
+    width: 550px;
+    height: 700px;
+    margin:auto;
+    margin-top: 100px;
+    border-radius: 40px;
+    opacity: 0.5;
+    padding: 3px;
+}
+img#pacman1, #pacman2{
+    position:absolute;
+    width: 150px;
+    height: 150px;
+}
+img#pacman1{
+    left:1175px;
+    top: 50px;
+}
+img#pacman2{
+    left:597px;
+    top: 700px;
+}
+h1#h1{
+    color: white;
+    text-align: center;
+    font-size: 40px;
+    opacity: 1;
+}
+p#txt{
+    color: white;
+    font-size: 25px;
+    margin-left: 50px;
+}
+input#login, #password, 
+input#width, #height {
+    margin-left: 50px;
+    height: 55px;
+    width: 400px;
+    border-radius: 10px;
+    background-color: rgb(37, 37, 37);
+    font-size: 27px;
+    color: white;
+    border: none;
+    transition: 0.5s;
+}
+input#login:focus, #password:focus,
+input#width:focus, #height:focus {
+    outline: none;
+    background-color: rgb(69, 69, 69);
+    transition: 0.5s;
+}
+#btn{
+    width: 180px;
+    height: 70px;
+    margin-left: 185px;
+    margin-top: 150px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    background-color: blue;
+    font-size: 25px;
+    transition: 0.5s;
+    text-shadow: 0 0 5px black;
+}
+#btn:hover{
+    background-color: yellow;
+    transition: 0.5s;
+}
