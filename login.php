@@ -10,18 +10,18 @@
     <link rel="stylesheet" href="styles/styl.css" type="text/css">
 </head>
 <body>
+    <?php include 'translate.php'; ?>
     <img src="images/pacman1.png" id="pacman1">
     <img src="images/pacman2.png" id="pacman2">
     <div id="main">
-        <h1 id="h1">Login Here</h1>
+        <h1 id="h1"><?php t("login-page");?></h1>
         <form method="POST">
-            <p id="txt">Login</p>
-            <input type="text" placeholder="Enter your login here" name="login" id="login">
-            <p id="txt">Password</p>
-            <input type="password" placeholder="Enter your password here" name="password" id="password">
-            <div style="margin-top:55px; margin-left:50px;"><span style="color:white; font-size:20px;">You don't have account yet? </span>
-            <a href="create-acc.php" id="link">Create one here.</a></div>
-            <input type="submit" value="Login" id="btn">
+            <p id="txt"><?php t("login");?></p>
+            <input type="text" placeholder="<?php t("login-label");?>" name="login" id="login">
+            <p id="txt"><?php t("password");?></p>
+            <input type="password" placeholder="<?php t("password-label");?>" name="password" id="password">
+            <?php t("login-account-exists");?>
+            <input type="submit" value="<?php t("login-button");?>" id="btn">
         </form>
     </div>
 </body>

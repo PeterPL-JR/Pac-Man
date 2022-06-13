@@ -10,20 +10,20 @@
     <link rel="stylesheet" type="text/css" href="styles/php-style.css">
 </head>
 <body>
+    <?php include 'translate.php';?>
     <img src="images/pacman1.png" id="pacman1">
     <img src="images/pacman2.png" id="pacman2">
     <div id="main">
-        <h1 id="h1">Sign Up Here</h1>
+        <h1 id="h1"><?php t("sign-up-page");?></h1>
         <form method="POST">
-            <p id="txt">Login</p>
-            <input type="text" placeholder="Enter your login here" name="login" id="login">
-            <p id="txt">Username</p>
-            <input type="text" placeholder="Enter your username here" name="username" id="username">
-            <p id="txt">Password</p>
-            <input type="password" placeholder="Enter your password here" name="password" id="password">
-            <div style="margin-top:35px; position:absolute; margin-left:50px;"><span style="color:white; font-size:20px;">You already have account? </span>
-            <a href="login.php" id="link">Log in here.</a></div>
-            <input type="submit" value="Sign up" id="btn">
+            <p id="txt"><?php t("login");?></p>
+            <input type="text" placeholder="<?php t("login-label");?>" name="login" id="login">
+            <p id="txt"><?php t("username");?></p>
+            <input type="text" placeholder="<?php t("username-label");?>" name="username" id="username">
+            <p id="txt"><?php t("password");?></p>
+            <input type="password" placeholder="<?php t("password-label");?>" name="password" id="password">
+            <?php t("create-account-exists");?>
+            <input type="submit" value="<?php t("sign-up-button");?>" id="btn">
         </form>
     </div>
 </body>
@@ -53,6 +53,10 @@ function login_error() {
             $login_exists = mysqli_query($base, "SELECT COUNT(*) FROM users WHERE login = '$login'");
             if(mysqli_fetch_row($login_exists)[0] == 0) {
                 mysqli_query($base, "INSERT INTO users (nick, login, password) VALUES ('$username', '$login', '$hash');");
+
+                $query2 = mysqli_query($base, "SELECT users.id FROM users WHERE users.login = '$login' AND users.password = '$hash';");
+                $user_id = mysqli_fetch_row($query2)[0];
+                mysqli_query($base, "INSERT INTO users_scores (user_id, level_id) VALUES($user_id, 1);");
 
                 setcookie("zalogowany", "true");
                 setcookie("nick", $username);

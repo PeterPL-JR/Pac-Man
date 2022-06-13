@@ -8,7 +8,7 @@ body {
 
 #content {
     position: relative;
-    width: 1350px;
+    /* width: 1350px; */
     height: max-content;
 
     margin: auto;

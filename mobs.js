@@ -1,3 +1,7 @@
+const _mode_random = 0;
+const _mode_target = 1;
+const _mode_begin = 2;
+
 const ghostsColors = [
     "red", "blue", "orange", "pink"
 ];
@@ -43,7 +47,7 @@ class Ghost {
         this.time = 0;
         this.firstTarget = false;
         this.way = findWay(this, this.xTarget, this.yTarget);
-        this.mode = "go-to-target";
+        this.mode = _mode_target;
 
         this.color = color;
         this.init();
@@ -108,7 +112,7 @@ class Ghost {
                 this.dead = true;
                 this.spectre = false;
                 this.way = findWay(this, beginX, beginY);
-                this.mode = "go-to-begin";
+                this.mode = _mode_target;
             } else {
                 losePoint();
             }
@@ -119,17 +123,17 @@ class Ghost {
             if (this.spectre && this.speed == this.mainSpeed) this.speed = spectreSpeed;
             if (!this.spectre && this.speed == spectreSpeed) this.speed = this.mainSpeed;
 
-            if (this.firstTarget && this.mode == "go-random" && this.way == null) {
+            if (this.firstTarget && this.mode == _mode_random && this.way == null) {
                 var random = getRandom(0, 11);
 
                 if (random == 11 && !this.spectre) {
                     this.way = findWay(this, playerX / tileSize, playerY / tileSize);
-                    this.mode = "go-to-target";
+                    this.mode = _mode_target;
                 }
             }
 
-            if (this.mode == "go-to-target" || this.mode == "go-to-begin") this.goToTarget();
-            else if (this.mode == "go-random") this.goRandom();
+            if (this.mode == _mode_target || this.mode == _mode_target) this.goToTarget();
+            else if (this.mode == _mode_random) this.goRandom();
         }
 
         if ((this.x + this.y) % tileSize == 0) {
@@ -142,7 +146,7 @@ class Ghost {
                 this.xDir = -this.xDir;
                 this.yDir = -this.yDir
                 if (!this.dead) {
-                    this.mode = "go-random";
+                    this.mode = _mode_random;
                 }
             }
         } else {
@@ -192,7 +196,7 @@ class Ghost {
                     this.firstTarget = true;
                 }
                 this.way = null;
-                this.mode = "go-random";
+                this.mode = _mode_random;
             }
         }
     }

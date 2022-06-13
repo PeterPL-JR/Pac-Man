@@ -1,0 +1,66 @@
+#language-title {
+    color: white;
+    font: bold 40px 'Verdana';
+
+    text-align: center;
+    padding-top: 20px;
+}
+
+#mainDiv {
+    height: 240px !important;
+}
+
+#blue, #yellow {
+    font-size: 65px;
+}
+
+#lang-select {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 30px;
+    width: 240px;
+
+    border: none;
+    outline: none;
+    
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+
+    background-color: blue;
+    transition: 0.5s;
+    text-shadow: 0 0 5px black;
+}
+#lang-select:focus {
+    border: none;
+    outline: none;
+}
+
+#lang-div {
+    width: max-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#save {
+    width:230px;
+    height: 50px;
+
+    position: absolute;
+    z-index: 10;
+
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    background-color: blue;
+    font-size: 25px;
+    transition: 0.5s;
+    text-shadow: 0 0 5px black;
+
+    margin-top: 630px;
+    margin-left: 835px;
+}
+#save:hover{
+    background-color: yellow;
+    transition: 0.5s;
+}

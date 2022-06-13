@@ -58,4 +58,25 @@ if($_GET['query'] == "save-score") {
     }
 }
 
+if($_GET['query'] == "unlocked-levels") {
+    $user_login = $_COOKIE['login'];
+    
+    include 'database.php';
+    $max_level = mysqli_query($base, "SELECT max(level_id) as max_level from users_scores inner join users on users.id = users_scores.user_id where users.login = '$user_login';");
+    echo mysqli_fetch_row($max_level)[0];
+}
+
+if($_GET['query'] == "unlock") {
+    // New Level
+    $level = $_GET['level'];
+
+    $login = $_COOKIE['login'];
+    $user_id = mysqli_fetch_row(mysqli_query($base, "SELECT id FROM users WHERE login = '$login';"))[0];
+    $score_exists = mysqli_query($base, "SELECT count(*) as counter from users_scores where user_id = $user_id AND level_id = $level;");
+
+    if(mysqli_fetch_row($score_exists)[0] == 0) {
+        mysqli_query($base, "INSERT INTO users_scores (user_id, level_id) VALUES($user_id, $level);");
+    }
+}
+
 ?>

@@ -15,6 +15,8 @@
 </head>
 <body>
 <?php
+include 'translate.php';
+
 if(!isset($_COOKIE['zalogowany'])) {
     $_COOKIE['zalogowany'] = "false";
 }
@@ -24,7 +26,7 @@ if($_COOKIE['zalogowany'] != "true") {
 if(isset($_SESSION['level'])) unset($_SESSION['level']);
 ?>
     <div id="header">
-        <h1><span id="blue">Choose</span><span id="yellow"> Level:</span></h1>
+        <h1><?php t("levels-page");?></h1>
     </div>
     <div id="mainDiv"></div>
     <a href="welcome.php"><img src="images/pacman2.png" id="button"></a>

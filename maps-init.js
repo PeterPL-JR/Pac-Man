@@ -1,31 +1,4 @@
-function getMap(path, onload) {
-    var image = new Image();
-    image.src = "images/maps/" + path;
-    var pixels = [];
-
-    image.onload = function () {
-        var memoryCanvas = document.createElement("canvas");
-        var memory = memoryCanvas.getContext("2d");
-
-        const width = image.width;
-        const height = image.height;
-
-        memoryCanvas.width = width;
-        memoryCanvas.height = height;
-        memory.drawImage(image, 0, 0);
-
-        for (var x = 0; x < width; x++) {
-            pixels[x] = [];
-            for (var y = 0; y < height; y++) {
-                pixels[x][y] = getColor(memory.getImageData(x, y, 1, 1).data);
-            }
-        }
-
-        if (onload != null) {
-            onload(pixels);
-        }
-    }
-}
+const emptyTileIndex = 4;
 
 function connectMap(index, onload) {
     serverGet("connect.php", {query: "map", index: index}, function(text) {
@@ -72,11 +45,11 @@ function createMapTiles(pixels, mapWidth, mapHeight) {
             var power = (pixels[x][y] == -4);
 
             var index = pixels[x][y];
-            if(index == -11 || index == -4) index = 13;
+            if(index == -11 || index == -4) index = emptyTileIndex;
             
             tiles[x][y] = { 
                 tile: index,
-                solid: (index != 13),
+                solid: (index != emptyTileIndex),
                 block: block,
                 power: power
             };

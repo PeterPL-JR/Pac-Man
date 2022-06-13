@@ -1,6 +1,27 @@
 var logged = false;
 var level = null;
 
+const playerPositionsX = {
+    "27": 13,
+    "33": 16
+};
+
+const ghostsTargets = {
+    "27": [[1, 1], [25, 1], [6, 11], [20, 11]],
+    "33": [[1, 1], [31, 1], [6, 11], [26, 11]]
+};
+
+const paddlePositions = {
+    
+};
+
+const tileSize = 50;
+var playerX;
+var playerY;
+
+var ghostBeginX;
+var ghostBeginY;
+
 function init() {
     for (var i = 0; i < 4; i++) onAllTheRightFaces[movingKeys[i]] = createImage("player_" + dirs[i] + ".png");
     beginImage = onAllTheRightFaces["D"];
@@ -29,6 +50,18 @@ function init() {
             // Size Variables
             mapWidth = array['width'];
             mapHeight = array['height'];
+
+            var content = getId("content");
+            content.style.width = (mapWidth * tileSize) + "px";
+            content.style.height = (mapHeight * tileSize) + "px";
+
+            // Set Player Position
+            playerX = playerPositionsX[`${mapWidth}`] * tileSize;
+            playerY = 11 * tileSize;
+
+            // Set Ghosts Begin Position 
+            ghostBeginX = playerPositionsX[`${mapWidth}`] * tileSize;
+            ghostBeginY = 5 * tileSize;
     
             width = mapWidth * tileSize;
             height = mapHeight * tileSize;
@@ -46,7 +79,7 @@ function init() {
             tiles = createMapTiles(array['map'], mapWidth, mapHeight);
             createGhosts();
     
-            createMapImages(function () {
+            createMapImages(levelNumber, function () {
                 document.body.onkeydown = function (event) {
                     var key = event.key.toUpperCase();
                     if (controlling && !pre && !winner && !over && !preWinner && movingKeys.indexOf(key) != -1) {
@@ -87,33 +120,30 @@ function createCoins() {
 }
 
 function createGhosts() {
-    var targets = [
-        [1, 1], [25, 1], [6, 11], [20, 11]
-    ];
+    var targets = ghostsTargets[`${mapWidth}`];
 
     for (var i = 0; i < ghostsColors.length; i++) {
-        var startX = 11 * tileSize + i * tileSize;
+        var startX = (ghostBeginX / tileSize - 2) * tileSize + i * tileSize;
         var startY = 5 * tileSize;
 
         if (i == 0) {
-            startX = 13 * tileSize;
+            startX = ghostBeginX;
             startY = 3 * tileSize;
         }
 
         var ghost = new Ghost(ghostsColors[i], startX, startY, targets[i][0], targets[i][1], beginTimes[i]);
         ghosts.push(ghost);
-        // break;
     }
 }
 
-function createMapImages(onload) {
+function createMapImages(levelIndex, onload) {
     serverGet("connect.php", { query: "tiles" }, function (text) {
         var links = JSON.parse(text);
         mapImages = [];
         winnerImages = [];
 
         for (var link of links) {
-            var image = createImage("tiles/" + link);
+            var image = createImage("tiles/level" + levelIndex + "/" + link);
             mapImages.push(image);
 
             var winnerImage = createImage("tiles/winner/" + link);

@@ -6,7 +6,6 @@ var healthPointsDiv = getId("health-points");
 var pointsDiv = getId("points");
 var gameOverDiv = getId("game-over");
 
-const tileSize = 50;
 var tiles = [];
 const ghosts = [];
 
@@ -32,9 +31,6 @@ const pointsForPower = 50;
 var xDir = 0;
 var yDir = 0;
 
-// 13/11
-var playerX = 13 * tileSize;
-var playerY = 11 * tileSize;
 var nextMove = null;
 var secondsInterval = null;
 
@@ -51,9 +47,6 @@ const allTheRightMoves = {
 
 const onAllTheRightFaces = {};
 const totalSpectreTime = 11;
-
-const ghostBeginX = 13 * tileSize;
-const ghostBeginY = 5 * tileSize;
 
 var time = 0;
 var secondsTime = 0;
@@ -99,7 +92,7 @@ var spectreTimes = [];
 function draw() {
     requestAnimationFrame(draw);
 
-    if(secondsInterval == null && !pre) {   
+    if (secondsInterval == null && !pre) {
         // Time Interval
         secondsInterval = setInterval(function () {
             secondsTime++;
@@ -107,12 +100,12 @@ function draw() {
     }
 
     var spectresSum = 0;
-    for(var ghost of ghosts) {
-        if(ghost.spectre) spectresSum++;
+    for (var ghost of ghosts) {
+        if (ghost.spectre) spectresSum++;
     }
-    if(spectresSum == 0) destroyedSpectres = 0;
+    if (spectresSum == 0) destroyedSpectres = 0;
 
-    if(!pre) time++;
+    if (!pre) time++;
     controlling = (playerX < 0 || playerX + tileSize > width) ? false : true;
 
     if ((playerX + playerY) % 50 == 0) {
@@ -125,7 +118,7 @@ function draw() {
             var tileX = playerX / tileSize + xBufferDir;
             var tileY = playerY / tileSize + yBufferDir;
 
-            if (!(tiles[tileX][tileY].solid || tileX == 13 && tileY == 4)) {
+            if (!(tiles[tileX][tileY].solid || tileX == (ghostBeginX / tileSize) && tileY == 4)) {
                 xDir = xBufferDir;
                 yDir = yBufferDir;
 
@@ -144,7 +137,7 @@ function draw() {
         var tileX = playerX / tileSize + xDir;
         var tileY = playerY / tileSize + yDir;
 
-        if (tiles[tileX] && tiles[tileX][tileY] && (tiles[tileX][tileY].solid || tileX == 13 && tileY == 4)) {
+        if (tiles[tileX] && tiles[tileX][tileY] && (tiles[tileX][tileY].solid || tileX == (ghostBeginX / tileSize) && tileY == 4)) {
             xDir = 0;
             yDir = 0;
         }
@@ -159,7 +152,7 @@ function draw() {
         }
     }
     canvas.fillStyle = "#ffafa4";
-    canvas.fillRect(13 * tileSize - 11, 4 * tileSize + 20, 73, 9);
+    canvas.fillRect(ghostBeginX - 12, 4 * tileSize + 20, 74, 9);
 
     // Render Coins
     for (var coin of gameCoins) {
@@ -171,7 +164,7 @@ function draw() {
     }
 
     // Render Ghosts
-    if(!winner && !over && preRenderGhosts) {
+    if (!winner && !over && preRenderGhosts) {
         for (var ghost of ghosts) {
             ghost.update();
             canvas.drawImage(ghost.face, ghost.x, ghost.y);
@@ -183,28 +176,9 @@ function draw() {
     var renderingImage = time % eatTime >= (eatTime * (4 / 9)) ? playerImage : fullPlayerImage;
 
     if (preWinner || winner || over || playerDead) renderingImage = fullPlayerImage;
-    if(!winner && !over) canvas.drawImage(renderingImage, playerX, playerY);
+    if (!winner && !over) canvas.drawImage(renderingImage, playerX, playerY);
 
-    // Start Game Text
-    if(pre) {
-        canvas.fillStyle = "yellow";
-        canvas.font = "bold 42px Verdana";
-        canvas.fillText("READY!", 590, 392);
-    }
-
-    // Winner Text
-    if(winner) {
-        canvas.fillStyle = "yellow";
-        canvas.font = "bold 45px Verdana";
-        canvas.fillText("VICTORY!", 560, 392);
-    }
-
-    // Game Over Text
-    if(over) {
-        canvas.fillStyle = "red";
-        canvas.font = "bold 42px Verdana";
-        canvas.fillText("GAME OVER", 535, 392);
-    }
+    updateTitles();
 
     if ((playerX + playerY) % 50 == 0) {
         var coinIndex = gameCoins.findIndex(function (obj) {
@@ -263,7 +237,7 @@ function draw() {
 function updateHealth() {
     // Player Health Points
     healthPointsDiv.innerHTML = "";
-    for(var i = 0; i < pacmans - 1; i++) {
+    for (var i = 0; i < pacmans - 1; i++) {
         var img = document.createElement("img");
         img.src = "images/player_left.png";
         img.className = "health-point";
@@ -273,6 +247,29 @@ function updateHealth() {
 
 function updatePoints() {
     pointsDiv.innerHTML = points;
+}
+
+function updateTitles() {
+    // Start Game Text
+    if (pre) {
+        canvas.fillStyle = "yellow";
+        canvas.font = "bold 42px Verdana";
+        canvas.fillText("READY!", ghostBeginX - 60, 392);
+    }
+
+    // Winner Text
+    if (winner) {
+        canvas.fillStyle = "yellow";
+        canvas.font = "bold 45px Verdana";
+        canvas.fillText("VICTORY!", ghostBeginX - 90, 392);
+    }
+
+    // Game Over Text
+    if (over) {
+        canvas.fillStyle = "red";
+        canvas.font = "bold 42px Verdana";
+        canvas.fillText("GAME OVER", ghostBeginX - 105, 392);
+    }
 }
 
 function setSpectreMode() {
@@ -305,34 +302,37 @@ function winGame() {
 
     var counter = 0;
     var interval = null;
-    
-    setTimeout(function() {
+
+    setTimeout(function () {
         winner = true;
         points += (pacmans - 1) * 500;
         updatePoints();
 
-        interval = setInterval(function() {
+        interval = setInterval(function () {
             winnerColors = counter % 2 == 0;
             counter++;
-            if(counter >= 6) {
+            if (counter >= 6) {
                 clearInterval(interval);
 
-                setTimeout(function() {
-                    serverGet("connect.php", {query: "save-score", points: points, level: level}, function(text) {
-                        window.location.href = logged ? "welcome.php" : "";
+                setTimeout(function () {
+                    serverGet("connect.php", { query: "save-score", points: points, level: level }, function (text) {
+                        if (logged) {
+                            serverGet("connect.php", { query: "unlock", level: level + 1 }, function (text) {
+                                window.location.href = "welcome.php";
+                            });
+                        } else {
+                            window.location.href = "";
+                        }
                     });
                 }, 1000);
-            } 
+            }
         }, 250);
     }, 1000);
 }
 
 function losePoint() {
-    xDir = 0;
-    yDir = 0;
-
     playerDead = true;
-    setTimeout(function() {
+    setTimeout(function () {
         pacmans--;
         secondsTime = 0;
         playerDead = false;
@@ -341,10 +341,13 @@ function losePoint() {
         ghosts.splice(0, 4);
         createGhosts();
 
-        playerX = 13 * tileSize;
+        playerX = playerPositionsX[`${mapWidth}`] * tileSize;
         playerY = 11 * tileSize;
 
-        if(pacmans <= 0) {
+        xDir = 0;
+        yDir = 0;
+
+        if (pacmans <= 0) {
             gameOver();
         }
     }, 1000);
@@ -355,7 +358,7 @@ function gameOver() {
     xDir = 0;
     yDir = 0;
 
-    setTimeout(function() {
+    setTimeout(function () {
         window.location.href = logged ? "welcome.php" : "";
     }, 2000);
 }

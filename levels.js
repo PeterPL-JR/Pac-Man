@@ -1,28 +1,30 @@
-function setup(){
+function request(){
+    var lvl;
+    serverGet("connect.php", {query: "unlocked-levels"}, function(text) {
+        lvl = parseInt(text);
+        setup(lvl);
+    });
+}
+
+function setup(lvl) {
     let mainDiv = getId("mainDiv");
-    var lvl = 1;
-    for(var i = 0; i<2; i++)
-    {
-        for(var j = 0; j<4; j++)
+
+    for(var i = 1; i <= 6; i++) {
+        let div = document.createElement("div");
+        mainDiv.appendChild(div);
+        if(i <= lvl)
         {
-            let div = document.createElement("div");
-            mainDiv.appendChild(div);
-            if(lvl == 1)
-            {
-                div.className = "levelActive";
-                div.innerHTML = lvl;
-                div.setAttribute("onclick", `startLevel(${lvl});`);
-            }
-            else
-            {
-                div.className = "levelDisabled";
-                let img = document.createElement("img");
-                img.src = "images/locked.png";
-                img.className = "locked";
-                // div.innerHTML = lvl;
-                div.appendChild(img);
-            }
-            lvl++;
+            div.className = "levelActive";
+            div.innerHTML = i;
+            div.setAttribute("onclick", `startLevel(${i});`);
+        }
+        else
+        {
+            div.className = "levelDisabled";
+            let img = document.createElement("img");
+            img.src = "images/locked.png";
+            img.className = "locked";
+            div.appendChild(img);
         }
     }
 }
@@ -33,4 +35,4 @@ function startLevel(index) {
     });
 }
 
-setup();
+request();

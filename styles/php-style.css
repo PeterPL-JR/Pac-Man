@@ -59,7 +59,7 @@ input#login:focus, #password:focus, #username:focus{
     background-color: rgb(69, 69, 69);
     transition: 0.5s;
 }
-input#btn{
+#btn {
     width: 180px;
     height: 70px;
     margin-left: 185px;
@@ -72,7 +72,7 @@ input#btn{
     transition: 0.5s;
     text-shadow: 0 0 5px black;
 }
-input#btn:hover{
+#btn:hover{
     background-color: yellow;
     transition: 0.5s;
 }
